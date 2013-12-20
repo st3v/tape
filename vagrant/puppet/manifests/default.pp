@@ -1,5 +1,6 @@
 exec { "apt-get-update":
     command => "/usr/bin/apt-get update",
+    onlyif => "/bin/sh -c '[ ! -f /var/cache/apt/pkgcache.bin ] || /usr/bin/find /etc/apt/* -cnewer /var/cache/apt/pkgcache.bin | /bin/grep . > /dev/null'"
 }
 
 package {'curl':
@@ -14,6 +15,11 @@ package {'git-core':
     require => Exec['apt-get-update']
 }
 
+$package_cache = "/tape/vagrant/.package-cache"
+file {"${package_cache}":
+    ensure => "directory"
+}
+
 package {'openjdk-7-jre-headless':
     provider => apt,
     ensure => latest,
@@ -22,10 +28,12 @@ package {'openjdk-7-jre-headless':
 
 class {'elasticsearch':
     version => '0.90.8',
-    require => [Exec['apt-get-update'],Package['openjdk-7-jre-headless']],
+    package_dir => "${package_cache}",
+    require => [Package['openjdk-7-jre-headless'],File["${package_cache}"]]
 }
 
 class {'typesafe':
     version => '1.0.9',
-    require => Package['openjdk-7-jre-headless']
+    package_dir => "${package_cache}",
+    require => [Package['openjdk-7-jre-headless'],File["${package_cache}"]]
 }

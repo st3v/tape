@@ -1,9 +1,9 @@
 
-class typesafe ($version) {
+class typesafe ($version, $package_dir = "/opt") {
 
-    exec{'get-activator':
-        command => "/usr/bin/wget -q http://downloads.typesafe.com/typesafe-activator/${version}/typesafe-activator-${version}.zip -O /opt/typesafe-activator-${version}.zip",
-        creates  => "/opt/typesafe-activator-${version}.zip",
+    exec{'typesafe::get-activator':
+        command => "/usr/bin/wget -q http://downloads.typesafe.com/typesafe-activator/${version}/typesafe-activator-${version}.zip -O ${package_dir}/typesafe-activator-${version}.zip",
+        creates  => "${package_dir}/typesafe-activator-${version}.zip",
         timeout  => 1800
     }
 
@@ -12,26 +12,26 @@ class typesafe ($version) {
         ensure => present
     }
 
-    exec{'unzip-activator':
-        command => "/usr/bin/sudo /usr/bin/unzip /opt/typesafe-activator-${version}.zip -d /usr/share/typesafe",
-        require => [Package['unzip'], Exec['get-activator']],
+    exec{'typesafe::unzip-activator':
+        command => "/usr/bin/sudo /usr/bin/unzip ${package_dir}/typesafe-activator-${version}.zip -d /usr/share/typesafe",
+        require => [Package['unzip'], Exec['typesafe::get-activator']],
         unless  => "/usr/bin/test -d /usr/share/typesafe/activator-${version}"
     }
 
-    exec{'unlink-activator':
+    exec{'typesafe::unlink-activator':
         command => "/usr/bin/sudo /bin/rm -f /usr/local/bin/activator",
-        require => Exec['unzip-activator'],
+        require => Exec['typesafe::unzip-activator'],
         onlyif => "/usr/bin/test -h /usr/local/bin/activator"
     }
 
-    exec{'link-activator':
+    exec{'typesafe::link-activator':
         command => "/usr/bin/sudo /bin/ln -s /usr/share/typesafe/activator-${version}/activator /usr/local/bin/",
-        require => Exec['unlink-activator']
+        require => Exec['typesafe::unlink-activator']
     }
 
-    exec{'chmod-activator':
+    exec{'typesafe::chmod-activator':
         command => "/usr/bin/sudo /bin/chmod 755 /usr/local/bin/activator",
-        require => Exec['link-activator'],
+        require => Exec['typesafe::link-activator'],
         onlyif => "/usr/bin/test -f /usr/local/bin/activator"
     }
 
@@ -42,7 +42,7 @@ class typesafe ($version) {
         mode   => 750,
     }
 
-    file { "/home/vagrant/.activator/activatorconfig.txt":
+    file {"/home/vagrant/.activator/activatorconfig.txt":
         mode => "0644",
         owner => 'vagrant',
         group => 'vagrant',
@@ -50,9 +50,9 @@ class typesafe ($version) {
         require => File['/home/vagrant/.activator']
     }
 
-    #exec{'run-activator':
+    #exec{'typesafe::run-activator':
     #   command => "/usr/local/bin/activator ui >> /var/log/activator.log 2>&1 &",
-    #   require => Exec['link-activator']
+    #   require => Exec['typesafe::link-activator']
     #}
 
 }

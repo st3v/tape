@@ -11,5 +11,8 @@ playground/*
 # vagrant
 .vagrant/
 
+# guest package cache
+vagrant/.package-cache/
+
 # mac
 .DS_Store
