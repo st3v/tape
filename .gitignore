@@ -5,7 +5,11 @@ target/
 project/target/
 project/project/
 
+# samples
 playground/*
+
+# vagrant
+.vagrant/
 
 # mac
 .DS_Store
