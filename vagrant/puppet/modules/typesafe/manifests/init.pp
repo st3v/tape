@@ -2,8 +2,8 @@
 class typesafe ($version) {
 
     exec{'get-activator':
-        command => "/usr/bin/wget -q http://downloads.typesafe.com/typesafe-activator/${version}/typesafe-activator-${version}.zip -O /tmp/typesafe-activator-${version}.zip",
-        creates  => "/tmp/typesafe-activator-${version}.zip",
+        command => "/usr/bin/wget -q http://downloads.typesafe.com/typesafe-activator/${version}/typesafe-activator-${version}.zip -O /opt/typesafe-activator-${version}.zip",
+        creates  => "/opt/typesafe-activator-${version}.zip",
         timeout  => 1800
     }
 
@@ -13,7 +13,7 @@ class typesafe ($version) {
     }
 
     exec{'unzip-activator':
-        command => "/usr/bin/sudo /usr/bin/unzip /tmp/typesafe-activator-${version}.zip -d /usr/share/typesafe",
+        command => "/usr/bin/sudo /usr/bin/unzip /opt/typesafe-activator-${version}.zip -d /usr/share/typesafe",
         require => [Package['unzip'], Exec['get-activator']],
         unless  => "/usr/bin/test -d /usr/share/typesafe/activator-${version}"
     }
