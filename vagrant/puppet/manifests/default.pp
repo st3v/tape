@@ -20,7 +20,7 @@ file {"${package_cache}":
     ensure => "directory"
 }
 
-package {'openjdk-7-jre-headless':
+package {'openjdk-7-jdk':
     provider => apt,
     ensure => latest,
     require => Exec['apt-get-update']
@@ -29,11 +29,11 @@ package {'openjdk-7-jre-headless':
 class {'elasticsearch':
     version => '0.90.8',
     package_dir => "${package_cache}",
-    require => [Package['openjdk-7-jre-headless'],File["${package_cache}"]]
+    require => [Package['openjdk-7-jdk'],File["${package_cache}"]]
 }
 
 class {'typesafe':
     version => '1.0.9',
     package_dir => "${package_cache}",
-    require => [Package['openjdk-7-jre-headless'],File["${package_cache}"]]
+    require => [Package['openjdk-7-jdk'],File["${package_cache}"]]
 }
